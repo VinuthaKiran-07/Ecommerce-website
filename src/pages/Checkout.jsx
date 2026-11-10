@@ -1,10 +1,10 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "motion/react";
 import {
   ArrowLeft,
   ArrowUpRight,
-  LockKeyhole,
   MapPin,
   ShoppingBag,
   ShieldCheck,
@@ -147,7 +147,7 @@ export default function Checkout() {
       },
       items: cart.map((item) => ({ ...item })),
       total: convertToINR(cartTotal),
-      status: "Demo order placed",
+      status: "Saved locally",
     };
 
     sessionStorage.setItem(
@@ -232,12 +232,15 @@ export default function Checkout() {
           </div>
 
           <h1 className="font-serif text-[clamp(3.5rem,8vw,7rem)] leading-none tracking-[-0.06em]">
-            Check<span className="italic text-[#B65C3A]">out.</span>
+            Check
+            <span className="italic text-[#B65C3A]">
+              out.
+            </span>
           </h1>
 
           <p className="mt-6 max-w-xl text-sm leading-7 text-[#756E65]">
-            Just a few more details before your discoveries
-            become yours. This is a simulated checkout experience.
+            Just a few more details to complete your
+            shopping experience.
           </p>
         </motion.div>
 
@@ -263,6 +266,7 @@ export default function Checkout() {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B65C3A]">
                   Step 01
                 </p>
+
                 <h2 className="mt-1 font-serif text-3xl tracking-tight">
                   Delivery Information
                 </h2>
@@ -270,7 +274,7 @@ export default function Checkout() {
             </div>
 
             <p className="mt-4 text-sm leading-7 text-[#827A70]">
-              Tell us where your order would be delivered.
+              Enter your contact and address details.
               All fields are required.
             </p>
 
@@ -346,7 +350,7 @@ export default function Checkout() {
             </div>
 
             <div className="mt-9 flex items-start gap-4 rounded-2xl bg-[#EEE8DE] p-5">
-              <LockKeyhole
+              <ShieldCheck
                 size={23}
                 strokeWidth={1.5}
                 className="shrink-0 text-[#B65C3A]"
@@ -354,13 +358,13 @@ export default function Checkout() {
 
               <div>
                 <h3 className="text-sm font-semibold">
-                  A Demo Checkout Experience
+                  Order Information
                 </h3>
 
                 <p className="mt-2 text-xs leading-6 text-[#756E65]">
-                  No real payment is collected and no order
-                  is sent to a retailer. This page demonstrates
-                  form validation and frontend order processing.
+                  Review your details before saving your order.
+                  Order information is stored in this browser
+                  session and is not submitted to a retailer.
                 </p>
               </div>
             </div>
@@ -411,7 +415,9 @@ export default function Checkout() {
 
                     <span className="shrink-0 text-sm font-semibold">
                       {formatINR(
-                        convertToINR(item.price * item.quantity)
+                        convertToINR(
+                          item.price * item.quantity
+                        )
                       )}
                     </span>
                   </div>
@@ -440,7 +446,7 @@ export default function Checkout() {
 
               <div className="mt-7 flex items-center justify-between border-t border-[#D3C9BC] pt-7">
                 <span className="font-serif text-xl">
-                  Demo Order Total
+                  Order Total
                 </span>
 
                 <span className="font-serif text-2xl tracking-tight">
@@ -454,7 +460,7 @@ export default function Checkout() {
                 className="group mt-9 flex w-full items-center justify-between rounded-full bg-[#1C1C1A] px-6 py-5 text-white transition hover:bg-[#B65C3A]"
               >
                 <span className="text-xs font-semibold uppercase tracking-[0.12em]">
-                  Place Demo Order
+                  Save Order
                 </span>
 
                 <ArrowUpRight
@@ -462,10 +468,6 @@ export default function Checkout() {
                   className="transition-transform group-hover:-translate-y-1 group-hover:translate-x-1"
                 />
               </button>
-
-              <p className="mt-5 text-center text-[11px] leading-5 text-[#827A70]">
-                No real payment or delivery will occur.
-              </p>
             </div>
 
             <div className="mt-8 grid gap-5 px-2">
@@ -480,8 +482,10 @@ export default function Checkout() {
                   <p className="text-sm font-medium">
                     Delivery Details
                   </p>
+
                   <p className="mt-1 text-xs leading-5 text-[#827A70]">
-                    Your address is used only for this demo order.
+                    Your address is included in your saved
+                    order information.
                   </p>
                 </div>
               </div>
@@ -495,10 +499,11 @@ export default function Checkout() {
 
                 <div>
                   <p className="text-sm font-medium">
-                    Simulated Order
+                    Order Summary
                   </p>
+
                   <p className="mt-1 text-xs leading-5 text-[#827A70]">
-                    Order details are stored in this browser session.
+                    Review your selected items and order total.
                   </p>
                 </div>
               </div>

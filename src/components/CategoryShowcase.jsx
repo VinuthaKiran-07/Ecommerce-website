@@ -29,51 +29,68 @@ const categories = [
 
 export default function CategoryShowcase() {
   return (
-    <section id="collections" className="mx-auto max-w-7xl px-6 py-20">
-      <div className="mb-10">
-        <p className="text-sm font-semibold uppercase tracking-widest text-orange-600">
-          Explore Collections
-        </p>
-        <h2 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">
-          Shop by Category
-        </h2>
-      </div>
+    <section
+      id="collections"
+      className="scroll-mt-32 bg-[#F7F4EE] py-16 sm:py-20 lg:py-24"
+    >
+      <div className="mx-auto max-w-[1440px] px-5 sm:px-8 md:px-10 lg:px-16">
+        <div className="mb-10 md:mb-14">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#B65C3A]">
+            Explore Collections
+          </p>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        {categories.map((item) => (
-          <motion.div
-            key={item.name}
-            whileHover={{ y: -8 }}
-            className="group relative h-[420px] overflow-hidden rounded-3xl"
-          >
-            <Link
-              to={`/products?category=${item.category}`}
-              className="block h-full w-full"
+          <h2 className="mt-4 font-serif text-5xl leading-tight tracking-[-0.05em] text-[#1C1C1A] sm:text-6xl lg:text-7xl">
+            Shop by <span className="italic">Category.</span>
+          </h2>
+
+          <p className="mt-4 max-w-lg text-sm leading-7 text-[#756E65] sm:text-base">
+            Discover thoughtfully selected pieces for every
+            corner of your life.
+          </p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+          {categories.map((item) => (
+            <motion.div
+              key={item.name}
+              whileHover={{ y: -6 }}
+              transition={{ duration: 0.3 }}
+              className="group relative h-[350px] overflow-hidden rounded-t-[150px] rounded-b-xl bg-[#DED7CA] sm:h-[400px] lg:h-[440px]"
             >
-              <img
-                src={item.image}
-                alt={item.name}
-                loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
+              <Link
+                to={`/products?category=${item.category}`}
+                aria-label={`Explore ${item.name} collection`}
+                className="block h-full w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B65C3A]"
+              >
+                <img
+                  src={item.image}
+                  alt={`${item.name} collection`}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
 
-              <div className="absolute bottom-7 left-7 right-7 flex items-end justify-between text-white">
-                <div>
-                  <p className="text-sm text-white/80">
-                    {item.subtitle}
-                  </p>
-                  <h3 className="mt-2 text-3xl font-bold">
-                    {item.name}
-                  </h3>
+                <div className="absolute bottom-7 left-6 right-6 flex items-end justify-between gap-3 text-white sm:left-7 sm:right-7">
+                  <div>
+                    <p className="text-xs tracking-wide text-white/80">
+                      {item.subtitle}
+                    </p>
+
+                    <h3 className="mt-2 font-serif text-4xl tracking-tight sm:text-5xl">
+                      {item.name}
+                    </h3>
+                  </div>
+
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/60 transition-colors group-hover:bg-white group-hover:text-[#1C1C1A]">
+                    <ArrowUpRight size={20} />
+                  </span>
                 </div>
-
-                <ArrowUpRight size={27} />
-              </div>
-            </Link>
-          </motion.div>
-        ))}
+              </Link>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

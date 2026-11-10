@@ -49,9 +49,9 @@ export default function OrderSuccess() {
           </h1>
 
           <p className="mt-5 text-sm leading-7 text-[#756E65]">
-            We couldn't find a recent demo order in this
-            browser session. Discover something beautiful
-            in our collection.
+              We couldn't find a recent saved order in this
+  browser session. Explore our collection to
+  discover something beautiful.
           </p>
 
           <Link
@@ -107,7 +107,7 @@ export default function OrderSuccess() {
           </motion.div>
 
           <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#B65C3A]">
-            Demo Order Confirmed
+             Order Confirmed
           </p>
 
           <h1 className="mt-5 font-serif text-[clamp(3.5rem,7vw,6.5rem)] leading-[1.02] tracking-[-0.06em]">
@@ -115,9 +115,8 @@ export default function OrderSuccess() {
           </h1>
 
           <p className="mx-auto mt-6 max-w-xl text-[15px] leading-8 text-[#756E65]">
-            {order.customer.name}, your ShopSphere demo order
-            has been created successfully. We hope you enjoyed
-            discovering something wonderful.
+            {order.customer.name}, your selections have been
+  saved successfully. Thank you for exploring ShopSphere.
           </p>
 
           <div className="mx-auto mt-8 inline-flex items-center gap-2 rounded-full border border-[#DDD5CA] bg-white/60 px-5 py-3">
@@ -189,7 +188,7 @@ export default function OrderSuccess() {
                 </p>
                 <p className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[#B65C3A]">
                   <Check size={16} />
-                  Demo order placed
+                 Order placed
                 </p>
               </div>
             </div>
@@ -271,15 +270,6 @@ export default function OrderSuccess() {
             </span>
           </div>
         </motion.section>
-
-        {/* Demo notice */}
-        <div className="mt-8 rounded-2xl border border-[#E2D9CD] bg-[#EEE8DE]/60 p-6 text-center">
-          <p className="text-xs leading-6 text-[#756E65]">
-            This is a simulated order for demonstration purposes.
-            No real payment was made, and no products will
-            be shipped.
-          </p>
-        </div>
 
         {/* Navigation */}
         <div className="mt-12 flex flex-wrap items-center justify-center gap-5">

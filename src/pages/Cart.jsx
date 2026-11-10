@@ -293,11 +293,6 @@ export default function Cart() {
                   className="transition-transform group-hover:-translate-y-1 group-hover:translate-x-1"
                 />
               </Link>
-
-              <p className="mt-5 text-center text-[11px] leading-5 text-[#827A70]">
-                This is a demo store. No real payments
-                are collected.
-              </p>
             </div>
 
             {/* Reassurance */}
@@ -326,10 +321,10 @@ export default function Cart() {
                 />
                 <div>
                   <p className="text-sm font-medium">
-                    Demo Checkout
+                  Checkout Information
                   </p>
                   <p className="mt-1 text-xs leading-5 text-[#827A70]">
-                    Your order is simulated for demonstration.
+                     Review your selections before continuing.
                   </p>
                 </div>
               </div>
