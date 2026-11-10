@@ -13,6 +13,7 @@ import { AuthProvider } from "@/context/AuthProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Footer from "@/components/Footer";
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
         />
         <Route path="/order-success" element={<OrderSuccess />} />
       </Routes>
+      <Footer />
       </AuthProvider>
       </WishlistProvider>
     </CartProvider>
