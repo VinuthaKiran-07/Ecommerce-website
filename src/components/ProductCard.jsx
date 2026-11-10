@@ -1,89 +1,102 @@
-
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { Star, ArrowUpRight, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { formatProductPrice } from "@/utils/currency";
+import { Heart, ArrowUpRight, Star } from "lucide-react";
 import { useWishlist } from "@/hooks/useWishlist";
+import { formatProductPrice } from "@/utils/currency";
 
 export default function ProductCard({ product }) {
-  const { toggleWishlist, isWishlisted } = useWishlist();
+  const { wishlist, toggleWishlist } = useWishlist();
 
-  const saved = isWishlisted(product.id);
+  const isWishlisted = wishlist.some(
+    (item) => item.id === product.id
+  );
 
   return (
     <motion.article
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.25 }}
-      className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white"
+      initial={{ opacity: 0, y: 25 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.5 }}
+      className="group min-w-0"
     >
       {/* Product image */}
-      <div className="relative flex h-64 items-center justify-center overflow-hidden bg-[#f5f4f0] p-8">
-
+      <div className="relative overflow-hidden rounded-[18px] bg-[#F0ECE5]">
         <Link
           to={`/products/${product.id}`}
-          className="flex h-full w-full items-center justify-center"
+          className="block"
+          aria-label={`View ${product.title}`}
         >
-          <img
-            src={product.thumbnail}
-            alt={product.title}
-            loading="lazy"
-            className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110"
-          />
+          <div className="aspect-[4/5] overflow-hidden">
+            <motion.img
+              src={product.thumbnail}
+              alt={product.title}
+              loading="lazy"
+              whileHover={{ scale: 1.08 }}
+              transition={{ duration: 0.5 }}
+              className="h-full w-full object-contain p-6"
+            />
+          </div>
         </Link>
 
         {/* Category label */}
-        <span className="pointer-events-none absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-medium">
-          {product.category}
+        <span className="pointer-events-none absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#292722] backdrop-blur">
+          {product.category?.replaceAll("-", " ")}
         </span>
 
-        {/* Wishlist heart button */}
+        {/* Wishlist */}
         <button
           type="button"
           onClick={() => toggleWishlist(product)}
           aria-label={
-            saved ? "Remove from wishlist" : "Add to wishlist"
+            isWishlisted
+              ? `Remove ${product.title} from wishlist`
+              : `Add ${product.title} to wishlist`
           }
-          className="absolute right-4 top-4 rounded-full bg-white p-3 shadow-sm transition hover:scale-110"
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1C1C1A] shadow-sm transition hover:scale-110"
         >
           <Heart
             size={19}
-            className={
-              saved
-                ? "fill-red-500 text-red-500"
-                : "text-neutral-700"
-            }
+            strokeWidth={1.7}
+            fill={isWishlisted ? "#B65C3A" : "none"}
+            color={isWishlisted ? "#B65C3A" : "#1C1C1A"}
           />
         </button>
+
+        {/* View product */}
+        <Link
+          to={`/products/${product.id}`}
+          className="absolute bottom-4 left-4 right-4 flex translate-y-3 items-center justify-between rounded-full bg-[#1C1C1A] px-5 py-3 text-xs font-semibold uppercase tracking-[0.1em] text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 focus:translate-y-0 focus:opacity-100"
+        >
+          View Details
+          <ArrowUpRight size={17} />
+        </Link>
       </div>
 
       {/* Product information */}
-      <div className="space-y-3 p-5">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="line-clamp-1 font-semibold">
-            {product.title}
-          </h3>
-
-          <span className="flex items-center gap-1 text-sm">
-            <Star
-              size={15}
-              className="fill-amber-400 text-amber-400"
-            />
-            {product.rating}
+      <div className="px-1 pt-5">
+        <div className="mb-2 flex items-center gap-1.5">
+          <Star size={13} fill="#B65C3A" color="#B65C3A" />
+          <span className="text-xs font-medium text-[#746D64]">
+            {product.rating?.toFixed(1) ?? "New"}
           </span>
         </div>
 
-        <p className="text-xl font-bold">
-          {formatProductPrice(product.price)}
-        </p>
+        <Link to={`/products/${product.id}`}>
+          <h3 className="line-clamp-2 font-serif text-[21px] leading-snug tracking-tight text-[#1C1C1A] transition-colors group-hover:text-[#B65C3A]">
+            {product.title}
+          </h3>
+        </Link>
 
-        <Button
-          className="w-full"
-          render={<Link to={`/products/${product.id}`} />}
-        >
-          View Product
-          <ArrowUpRight size={16} />
-        </Button>
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-base font-semibold text-[#292722]">
+            {formatProductPrice(product.price)}
+          </span>
+          <ArrowUpRight
+            size={17}
+            strokeWidth={1.5}
+            className="text-[#B65C3A]"
+          />
+        </div>
       </div>
     </motion.article>
   );
