@@ -29,7 +29,7 @@ const categories = [
 
 export default function CategoryShowcase() {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20">
+    <section id="collections" className="mx-auto max-w-7xl px-6 py-20">
       <div className="mb-10">
         <p className="text-sm font-semibold uppercase tracking-widest text-orange-600">
           Explore Collections

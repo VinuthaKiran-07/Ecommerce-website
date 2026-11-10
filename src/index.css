@@ -127,4 +127,11 @@
   html {
     @apply font-sans;
     }
+    html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f7f4ee;
+}
 }

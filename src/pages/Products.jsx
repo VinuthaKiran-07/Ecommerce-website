@@ -4,11 +4,13 @@ import axios from "axios";
 import ProductCard from "@/components/ProductCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useSearchParams } from "react-router-dom";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
+  const category = searchParams.get("category") || "all";
   const [sort, setSort] = useState("default");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -96,9 +98,12 @@ export default function Products() {
         <select
           value={category}
           onChange={(e) => {
-            setCategory(e.target.value);
+            const selected = e.target.value;
+            setSearchParams(
+               selected === "all" ? {} : { category: selected }
+            );
             setPage(1);
-          }}
+    }}
           className="h-10 rounded-md border border-neutral-200 bg-white px-3"
         >
           {categories.map((item) => (
