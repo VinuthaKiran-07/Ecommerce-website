@@ -2,7 +2,7 @@ const USD_TO_INR = 85; // Demo rate, not live
 
 export function convertToINR(usdPrice) {
   return usdPrice * USD_TO_INR;
-}
+} // Example usage
 
 export function formatINR(amount) {
   return new Intl.NumberFormat("en-IN", {

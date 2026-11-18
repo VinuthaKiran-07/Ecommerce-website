@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { WishlistContext } from "./wishlist-context";
 
 function loadWishlist() {
@@ -23,7 +23,7 @@ export function WishlistProvider({ children }) {
     );
   }, [wishlist]);
 
-  function toggleWishlist(product) {
+  const toggleWishlist = useCallback((product) => {
     setWishlist((previous) => {
       const exists = previous.some(
         (item) => item.id === product.id
@@ -33,15 +33,20 @@ export function WishlistProvider({ children }) {
         ? previous.filter((item) => item.id !== product.id)
         : [...previous, product];
     });
-  }
+  }, []);
 
-  function isWishlisted(id) {
+  const isWishlisted = useCallback((id) => {
     return wishlist.some((item) => item.id === id);
-  }
+  }, [wishlist]);
+
+  const value = useMemo(
+    () => ({ wishlist, toggleWishlist, isWishlisted }),
+    [wishlist, toggleWishlist, isWishlisted]
+  );
 
   return (
     <WishlistContext.Provider
-      value={{ wishlist, toggleWishlist, isWishlisted }}
+      value={value}
     >
       {children}
     </WishlistContext.Provider>

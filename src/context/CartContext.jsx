@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { CartContext } from "./cart-context";
 
 
@@ -87,20 +87,25 @@ export function CartProvider({ children }) {
     );
   }, [cart]);
 
-  const addToCart = (product) =>
+  const addToCart = useCallback((product) => {
     dispatch({ type: "ADD_TO_CART", payload: product });
+  }, []);
 
-  const removeFromCart = (id) =>
+  const removeFromCart = useCallback((id) => {
     dispatch({ type: "REMOVE_FROM_CART", payload: id });
+  }, []);
 
-  const increaseQuantity = (id) =>
+  const increaseQuantity = useCallback((id) => {
     dispatch({ type: "INCREASE_QUANTITY", payload: id });
+  }, []);
 
-  const decreaseQuantity = (id) =>
+  const decreaseQuantity = useCallback((id) => {
     dispatch({ type: "DECREASE_QUANTITY", payload: id });
+  }, []);
 
-  const clearCart = () =>
+  const clearCart = useCallback(() => {
     dispatch({ type: "CLEAR_CART" });
+  }, []);
 
   const cartCount = cart.reduce(
     (total, item) => total + item.quantity,
@@ -112,18 +117,29 @@ export function CartProvider({ children }) {
     0
   );
 
+  const value = useMemo(() => ({
+    cart,
+    addToCart,
+    removeFromCart,
+    increaseQuantity,
+    decreaseQuantity,
+    clearCart,
+    cartCount,
+    cartTotal,
+  }), [
+    cart,
+    addToCart,
+    removeFromCart,
+    increaseQuantity,
+    decreaseQuantity,
+    clearCart,
+    cartCount,
+    cartTotal,
+  ]);
+
   return (
     <CartContext.Provider
-      value={{
-        cart,
-        addToCart,
-        removeFromCart,
-        increaseQuantity,
-        decreaseQuantity,
-        clearCart,
-        cartCount,
-        cartTotal,
-      }}
+      value={value}
     >
       {children}
     </CartContext.Provider>

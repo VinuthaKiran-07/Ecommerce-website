@@ -1,14 +1,17 @@
+import { memo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Heart, ArrowUpRight, Star } from "lucide-react";
 import { useWishlist } from "@/hooks/useWishlist";
 import { formatProductPrice } from "@/utils/currency";
 
-export default function ProductCard({ product }) {
-  const { wishlist, toggleWishlist } = useWishlist();
+function ProductCard({ product }) {
+  const { isWishlisted, toggleWishlist } = useWishlist();
 
-  const isWishlisted = wishlist.some(
-    (item) => item.id === product.id
+  const productIsWishlisted = isWishlisted(product.id);
+  const handleWishlistToggle = useCallback(
+    () => toggleWishlist(product),
+    [product, toggleWishlist]
   );
 
   return (
@@ -46,9 +49,9 @@ export default function ProductCard({ product }) {
         {/* Wishlist */}
         <button
           type="button"
-          onClick={() => toggleWishlist(product)}
+          onClick={handleWishlistToggle}
           aria-label={
-            isWishlisted
+            productIsWishlisted
               ? `Remove ${product.title} from wishlist`
               : `Add ${product.title} to wishlist`
           }
@@ -57,8 +60,8 @@ export default function ProductCard({ product }) {
           <Heart
             size={19}
             strokeWidth={1.7}
-            fill={isWishlisted ? "#B65C3A" : "none"}
-            color={isWishlisted ? "#B65C3A" : "#1C1C1A"}
+            fill={productIsWishlisted ? "#B65C3A" : "none"}
+            color={productIsWishlisted ? "#B65C3A" : "#1C1C1A"}
           />
         </button>
 
@@ -101,3 +104,5 @@ export default function ProductCard({ product }) {
     </motion.article>
   );
 }
+
+export default memo(ProductCard);
