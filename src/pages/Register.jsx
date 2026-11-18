@@ -1,34 +1,26 @@
 
-import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { motion } from "motion/react";
 import { ArrowRight, ArrowUpRight, Heart, ShieldCheck } from "lucide-react";
 
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    mode: "onSubmit",
+    defaultValues: { name: "", email: "" },
+  });
 
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    if (name.trim().length < 2) {
-      setError("Name must contain at least 2 characters.");
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setError("Enter a valid email address.");
-      return;
-    }
-
-    login(name.trim(), email.trim());
+  function onSubmit(data) {
+    login(data.name.trim(), data.email.trim());
     navigate(location.state?.from || "/", { replace: true });
   }
 
@@ -102,7 +94,7 @@ export default function Register() {
               A world of thoughtful discoveries awaits.
             </p>
 
-            <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-10 space-y-6">
               <div>
                 <label
                   htmlFor="register-name"
@@ -115,14 +107,22 @@ export default function Register() {
                   id="register-name"
                   type="text"
                   autoComplete="name"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    setError("");
-                  }}
+                  {...register("name", {
+                    required: "Enter your name.",
+                    minLength: {
+                      value: 2,
+                      message: "Name must contain at least 2 characters.",
+                    },
+                  })}
                   placeholder="Your full name"
+                  aria-invalid={Boolean(errors.name)}
                   className={inputClass}
                 />
+                {errors.name && (
+                  <p className="mt-2 text-xs text-red-700" role="alert">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -137,21 +137,23 @@ export default function Register() {
                   id="register-email"
                   type="email"
                   autoComplete="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setError("");
-                  }}
+                  {...register("email", {
+                    required: "Enter your email address.",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Enter a valid email address.",
+                    },
+                  })}
                   placeholder="you@example.com"
+                  aria-invalid={Boolean(errors.email)}
                   className={inputClass}
                 />
+                {errors.email && (
+                  <p className="mt-2 text-xs text-red-700" role="alert">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
-
-              {error && (
-                <p role="alert" className="text-sm text-red-700">
-                  {error}
-                </p>
-              )}
 
               <button
                 type="submit"

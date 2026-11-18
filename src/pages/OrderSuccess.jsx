@@ -66,6 +66,11 @@ export default function OrderSuccess() {
     );
   }
 
+  const paymentNote =
+    order.payment?.method === "cod"
+      ? "Cash on delivery"
+      : "Demo payment · no charge";
+
   const itemCount = order.items.reduce(
     (sum, item) => sum + item.quantity,
     0
@@ -188,7 +193,7 @@ export default function OrderSuccess() {
                 </p>
                 <p className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[#B65C3A]">
                   <Check size={16} />
-                 Order placed
+                  {order.status}
                 </p>
               </div>
             </div>
@@ -266,7 +271,7 @@ export default function OrderSuccess() {
             </div>
 
             <span className="rounded-full border border-[#D3C9BC] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#756E65]">
-              No Payment Collected
+              {paymentNote}
             </span>
           </div>
         </motion.section>

@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -27,6 +28,21 @@ export default function Cart() {
     increaseQuantity,
     decreaseQuantity,
   } = useCart();
+
+  const handleCartAction = useCallback(
+    (event) => {
+      const button = event.target.closest("button[data-cart-action]");
+      if (!button) return;
+
+      const id = Number(button.dataset.productId);
+      const action = button.dataset.cartAction;
+
+      if (action === "decrease") decreaseQuantity(id);
+      if (action === "increase") increaseQuantity(id);
+      if (action === "remove") removeFromCart(id);
+    },
+    [decreaseQuantity, increaseQuantity, removeFromCart]
+  );
 
   if (cart.length === 0) {
     return (
@@ -110,7 +126,7 @@ export default function Cart() {
         {/* Cart and order summary */}
         <div className="mt-12 grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_370px] lg:gap-16">
           {/* Cart items */}
-          <section aria-label="Items in your bag">
+          <section aria-label="Items in your bag" onClick={handleCartAction}>
             <div className="mb-7 flex items-center justify-between">
               <h2 className="text-xs font-semibold uppercase tracking-[0.2em]">
                 Your Selections
@@ -171,7 +187,8 @@ export default function Cart() {
                       <div className="inline-flex items-center rounded-full border border-[#DCD5CA] bg-white/60 p-1">
                         <button
                           type="button"
-                          onClick={() => decreaseQuantity(item.id)}
+                          data-cart-action="decrease"
+                          data-product-id={item.id}
                           aria-label={`Decrease quantity of ${item.title}`}
                           className="flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-[#EEE8DE]"
                         >
@@ -184,7 +201,8 @@ export default function Cart() {
 
                         <button
                           type="button"
-                          onClick={() => increaseQuantity(item.id)}
+                          data-cart-action="increase"
+                          data-product-id={item.id}
                           disabled={
                             item.quantity >= (item.stock ?? Infinity)
                           }
@@ -197,7 +215,8 @@ export default function Cart() {
 
                       <button
                         type="button"
-                        onClick={() => removeFromCart(item.id)}
+                        data-cart-action="remove"
+                        data-product-id={item.id}
                         aria-label={`Remove ${item.title} from cart`}
                         className="inline-flex items-center gap-2 text-xs text-[#827A70] transition hover:text-[#B65C3A]"
                       >

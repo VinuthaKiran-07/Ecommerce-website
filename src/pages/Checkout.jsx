@@ -1,6 +1,6 @@
 
-import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { motion } from "motion/react";
 import {
   ArrowLeft,
@@ -61,103 +61,43 @@ const fields = [
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { cart, cartTotal, clearCart } = useCart();
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
+  const { cart, cartTotal } = useCart();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    mode: "onSubmit",
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+    },
   });
 
-  const [errors, setErrors] = useState({});
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-
-    setForm((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-
-    setErrors((previous) => ({
-      ...previous,
-      [name]: "",
-    }));
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-
-    const newErrors = {};
-
-    if (form.name.trim().length < 2) {
-      newErrors.name = "Enter your full name.";
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
-      newErrors.email = "Enter a valid email address.";
-    }
-
-    if (!/^[6-9]\d{9}$/.test(form.phone.trim())) {
-      newErrors.phone = "Enter a valid 10-digit Indian mobile number.";
-    }
-
-    if (form.address.trim().length < 10) {
-      newErrors.address = "Enter your complete address.";
-    }
-
-    if (!form.city.trim()) {
-      newErrors.city = "City is required.";
-    }
-
-    if (!form.state.trim()) {
-      newErrors.state = "State is required.";
-    }
-
-    if (!/^\d{6}$/.test(form.pincode.trim())) {
-      newErrors.pincode = "Enter a valid 6-digit PIN code.";
-    }
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length > 0) {
-      return;
-    }
-
-    if (cart.length === 0) {
-      return;
-    }
-
-    const order = {
-      id: `SS-${Date.now()}`,
-      date: new Date().toISOString(),
-      customer: {
-        ...form,
-        name: form.name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        address: form.address.trim(),
-        city: form.city.trim(),
-        state: form.state.trim(),
-        pincode: form.pincode.trim(),
-      },
-      items: cart.map((item) => ({ ...item })),
-      total: convertToINR(cartTotal),
-      status: "Saved locally",
-    };
+  function onSubmit(data) {
+    if (cart.length === 0) return;
 
     sessionStorage.setItem(
-      "shopsphere-last-order",
-      JSON.stringify(order)
+      "shopsphere-pending-checkout",
+      JSON.stringify({
+        customer: {
+          name: data.name.trim(),
+          email: data.email.trim(),
+          phone: data.phone.trim(),
+          address: data.address.trim(),
+          city: data.city.trim(),
+          state: data.state.trim(),
+          pincode: data.pincode.trim(),
+        },
+      })
     );
 
-    clearCart();
-
-    navigate("/order-success", { replace: true });
+    navigate("/checkout/payment");
   }
 
   const inputClass =
@@ -248,7 +188,7 @@ export default function Checkout() {
           {/* Delivery form */}
           <motion.form
             id="checkout-form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             noValidate
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -274,8 +214,8 @@ export default function Checkout() {
             </div>
 
             <p className="mt-4 text-sm leading-7 text-[#827A70]">
-              Enter your contact and address details.
-              All fields are required.
+              Enter your contact and address details first. You&apos;ll choose
+              a payment method on the next step.
             </p>
 
             <div className="mt-9 grid gap-x-5 gap-y-6 sm:grid-cols-2">
@@ -290,11 +230,43 @@ export default function Checkout() {
 
                   <input
                     id={field.name}
-                    name={field.name}
                     type={field.type}
                     autoComplete={field.autoComplete}
-                    value={form[field.name]}
-                    onChange={handleChange}
+                    {...register(field.name, {
+                      required: `${field.label} is required.`,
+                      ...(field.name === "name"
+                        ? {
+                            minLength: {
+                              value: 2,
+                              message: "Enter your full name.",
+                            },
+                          }
+                        : {}),
+                      ...(field.name === "email"
+                        ? {
+                            pattern: {
+                              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                              message: "Enter a valid email address.",
+                            },
+                          }
+                        : {}),
+                      ...(field.name === "phone"
+                        ? {
+                            pattern: {
+                              value: /^[6-9]\d{9}$/,
+                              message: "Enter a valid 10-digit Indian mobile number.",
+                            },
+                          }
+                        : {}),
+                      ...(field.name === "pincode"
+                        ? {
+                            pattern: {
+                              value: /^\d{6}$/,
+                              message: "Enter a valid 6-digit PIN code.",
+                            },
+                          }
+                        : {}),
+                    })}
                     placeholder={field.placeholder}
                     aria-invalid={Boolean(errors[field.name])}
                     aria-describedby={
@@ -310,7 +282,7 @@ export default function Checkout() {
                       id={`${field.name}-error`}
                       className="mt-2 text-xs text-red-700"
                     >
-                      {errors[field.name]}
+                      {errors[field.name].message}
                     </p>
                   )}
                 </div>
@@ -327,10 +299,14 @@ export default function Checkout() {
 
               <textarea
                 id="address"
-                name="address"
                 rows={4}
-                value={form.address}
-                onChange={handleChange}
+                {...register("address", {
+                  required: "Enter your complete address.",
+                  minLength: {
+                    value: 10,
+                    message: "Enter your complete address.",
+                  },
+                })}
                 placeholder="House number, street, locality, landmark"
                 aria-invalid={Boolean(errors.address)}
                 aria-describedby={
@@ -344,7 +320,7 @@ export default function Checkout() {
                   id="address-error"
                   className="mt-2 text-xs text-red-700"
                 >
-                  {errors.address}
+                  {errors.address.message}
                 </p>
               )}
             </div>
@@ -362,9 +338,9 @@ export default function Checkout() {
                 </h3>
 
                 <p className="mt-2 text-xs leading-6 text-[#756E65]">
-                  Review your details before saving your order.
-                  Order information is stored in this browser
-                  session and is not submitted to a retailer.
+                  Review your details before choosing a payment method.
+                  Order information is stored in this browser session and is
+                  not submitted to a retailer.
                 </p>
               </div>
             </div>
@@ -460,7 +436,7 @@ export default function Checkout() {
                 className="group mt-9 flex w-full items-center justify-between rounded-full bg-[#1C1C1A] px-6 py-5 text-white transition hover:bg-[#B65C3A]"
               >
                 <span className="text-xs font-semibold uppercase tracking-[0.12em]">
-                  Save Order
+                  Continue to Payment
                 </span>
 
                 <ArrowUpRight

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -103,9 +103,13 @@ export default function Products() {
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const currentPage = Math.min(page, Math.max(totalPages, 1));
 
-  const visible = filtered.slice(
-    (currentPage - 1) * PER_PAGE,
-    currentPage * PER_PAGE
+  const visible = useMemo(
+    () =>
+      filtered.slice(
+        (currentPage - 1) * PER_PAGE,
+        currentPage * PER_PAGE
+      ),
+    [filtered, currentPage]
   );
 
   const hasFilters =
@@ -113,28 +117,62 @@ export default function Products() {
     category !== "all" ||
     sort !== "default";
 
-  function changeCategory(value) {
+  const changeCategory = useCallback((value) => {
     setSearchParams(
       value === "all" ? {} : { category: value }
     );
     setPage(1);
-  }
+  }, [setSearchParams]);
 
-  function clearFilters() {
+  const clearFilters = useCallback(() => {
     setSearch("");
     setSort("default");
     setSearchParams({});
     setPage(1);
-  }
+  }, [setSearchParams]);
 
-  function changePage(nextPage) {
+  const changePage = useCallback((nextPage) => {
     setPage(nextPage);
 
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
-  }
+  }, []);
+
+  const handleSearchChange = useCallback((event) => {
+    setSearch(event.target.value);
+    setPage(1);
+  }, []);
+
+  const handleSortChange = useCallback((event) => {
+    setSort(event.target.value);
+    setPage(1);
+  }, []);
+
+  const handleClearSearch = useCallback(() => {
+    setSearch("");
+    setPage(1);
+  }, []);
+
+  const handleCategoryChange = useCallback(
+    (event) => changeCategory(event.target.value),
+    [changeCategory]
+  );
+
+  const handleRetry = useCallback(() => {
+    window.location.reload();
+  }, []);
+
+  const handlePreviousPage = useCallback(
+    () => changePage(currentPage - 1),
+    [changePage, currentPage]
+  );
+
+  const handleNextPage = useCallback(
+    () => changePage(currentPage + 1),
+    [changePage, currentPage]
+  );
 
   const controlClass =
     "h-12 w-full rounded-full border border-[#DCD5CA] bg-white/80 px-5 text-sm text-[#292722] outline-none transition focus:border-[#B65C3A] focus:ring-2 focus:ring-[#B65C3A]/10";
@@ -211,10 +249,7 @@ export default function Products() {
             <input
               type="search"
               value={search}
-              onChange={(event) => {
-                setSearch(event.target.value);
-                setPage(1);
-              }}
+              onChange={handleSearchChange}
               placeholder="Search something wonderful..."
               aria-label="Search products"
               className={`${controlClass} pl-13 pr-10`}
@@ -223,10 +258,7 @@ export default function Products() {
             {search && (
               <button
                 type="button"
-                onClick={() => {
-                  setSearch("");
-                  setPage(1);
-                }}
+                onClick={handleClearSearch}
                 aria-label="Clear search"
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-[#92897E] hover:text-[#1C1C1A]"
               >
@@ -238,7 +270,7 @@ export default function Products() {
           {/* Category */}
           <select
             value={category}
-            onChange={(event) => changeCategory(event.target.value)}
+            onChange={handleCategoryChange}
             aria-label="Filter by category"
             className={controlClass}
           >
@@ -254,10 +286,7 @@ export default function Products() {
           {/* Sort */}
           <select
             value={sort}
-            onChange={(event) => {
-              setSort(event.target.value);
-              setPage(1);
-            }}
+            onChange={handleSortChange}
             aria-label="Sort products"
             className={controlClass}
           >
@@ -324,7 +353,7 @@ export default function Products() {
             <p className="mt-3 text-[#756E65]">{error}</p>
             <button
               type="button"
-              onClick={() => window.location.reload()}
+              onClick={handleRetry}
               className="mt-6 rounded-full bg-[#1C1C1A] px-7 py-3 text-sm text-white"
             >
               Try again
@@ -377,7 +406,7 @@ export default function Products() {
                 <button
                   type="button"
                   disabled={currentPage === 1}
-                  onClick={() => changePage(currentPage - 1)}
+                  onClick={handlePreviousPage}
                   className="inline-flex items-center gap-2 rounded-full border border-[#DCD5CA] px-5 py-3 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[#1C1C1A] hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
                 >
                   <ArrowLeft size={16} />
@@ -391,7 +420,7 @@ export default function Products() {
                 <button
                   type="button"
                   disabled={currentPage === totalPages}
-                  onClick={() => changePage(currentPage + 1)}
+                  onClick={handleNextPage}
                   className="inline-flex items-center gap-2 rounded-full border border-[#DCD5CA] px-5 py-3 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[#1C1C1A] hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
                 >
                   Next

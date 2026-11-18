@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
@@ -66,6 +66,38 @@ export default function ProductDetails() {
     return () => controller.abort();
   }, [id]);
 
+  const inStock = Boolean(product?.stock > 0);
+
+  const handleAddToCart = useCallback(() => {
+    if (!product || !inStock) return;
+
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product);
+    }
+
+    setAdded(true);
+  }, [addToCart, inStock, product, quantity]);
+
+  const handleWishlistToggle = useCallback(() => {
+    if (product) toggleWishlist(product);
+  }, [product, toggleWishlist]);
+
+  const handleImageSelect = useCallback((event) => {
+    setSelectedImage(event.currentTarget.dataset.image);
+  }, []);
+
+  const handleDecreaseQuantity = useCallback(() => {
+    setQuantity((currentQuantity) => Math.max(1, currentQuantity - 1));
+    setAdded(false);
+  }, []);
+
+  const handleIncreaseQuantity = useCallback(() => {
+    setQuantity((currentQuantity) =>
+      Math.min(product?.stock ?? 1, currentQuantity + 1)
+    );
+    setAdded(false);
+  }, [product?.stock]);
+
   if (loading) {
     return (
       <main className="min-h-screen bg-[#F7F4EE] px-6 py-16">
@@ -110,19 +142,6 @@ export default function ProductDetails() {
   const isWishlisted = wishlist.some(
     (item) => item.id === product.id
   );
-
-  const inStock = product.stock > 0;
-
-  function handleAddToCart() {
-    if (!inStock) return;
-
-    // Use the existing reducer's ADD_TO_CART action.
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product);
-    }
-
-    setAdded(true);
-  }
 
   return (
     <main className="min-h-screen bg-[#F7F4EE] text-[#1C1C1A]">
@@ -171,7 +190,7 @@ export default function ProductDetails() {
 
               <button
                 type="button"
-                onClick={() => toggleWishlist(product)}
+                 onClick={handleWishlistToggle}
                 aria-label={
                   isWishlisted
                     ? "Remove from wishlist"
@@ -193,7 +212,8 @@ export default function ProductDetails() {
                 <button
                   type="button"
                   key={`${image}-${index}`}
-                  onClick={() => setSelectedImage(image)}
+                  onClick={handleImageSelect}
+                  data-image={image}
                   aria-label={`View product image ${index + 1}`}
                   aria-pressed={selectedImage === image}
                   className={`h-20 w-20 overflow-hidden rounded-xl border-2 bg-[#EEE8DE] p-2 transition sm:h-24 sm:w-24 ${
@@ -287,10 +307,7 @@ export default function ProductDetails() {
               <div className="inline-flex items-center rounded-full border border-[#DCD5CA] bg-white/70 p-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    setQuantity((q) => Math.max(1, q - 1));
-                    setAdded(false);
-                  }}
+                  onClick={handleDecreaseQuantity}
                   disabled={quantity <= 1}
                   aria-label="Decrease quantity"
                   className="flex h-10 w-10 items-center justify-center rounded-full transition hover:bg-[#EEE8DE] disabled:opacity-30"
@@ -304,12 +321,7 @@ export default function ProductDetails() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setQuantity((q) =>
-                      Math.min(product.stock, q + 1)
-                    );
-                    setAdded(false);
-                  }}
+                  onClick={handleIncreaseQuantity}
                   disabled={!inStock || quantity >= product.stock}
                   aria-label="Increase quantity"
                   className="flex h-10 w-10 items-center justify-center rounded-full transition hover:bg-[#EEE8DE] disabled:opacity-30"
